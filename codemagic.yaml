@@ -1,0 +1,68 @@
+workflows:
+  ios-unsigned-ipa:
+    name: Build iOS Unsigned IPA
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+
+    environment:
+      vars:
+        XCODE_PROJECT: "Unity-iPhone.xcodeproj"
+        XCODE_SCHEME: "Unity-iPhone"
+        OUTPUT_IPA_NAME: "NRO_AllStars_unsigned.ipa"
+      xcode: 16.0
+      cocoapods: default
+
+    scripts:
+      - name: Pull Git LFS files
+        script: |
+          echo "=== Pulling Git LFS files ==="
+          git lfs install
+          git lfs pull || true
+
+      - name: Disable Code Signing in Project
+        script: |
+          echo "=== Disabling code signing in $XCODE_PROJECT ==="
+          sed -i '' \
+            -e 's/CODE_SIGN_IDENTITY = "iPhone Developer";/CODE_SIGN_IDENTITY = "";/g' \
+            -e 's/CODE_SIGN_IDENTITY\[sdk=iphoneos\*\] = "iPhone Developer";/CODE_SIGN_IDENTITY[sdk=iphoneos*] = "";/g' \
+            -e 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = "";/g' \
+            -e 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' \
+            -e 's/PROVISIONING_PROFILE = [^;]*;/PROVISIONING_PROFILE = "";/g' \
+            -e 's/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = "";/g' \
+            "$XCODE_PROJECT/project.pbxproj"
+
+      - name: Build unsigned .app
+        script: |
+          echo "=== Building Xcode project (Release, unsigned) ==="
+          xcodebuild build \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf \
+            COMPILER_INDEX_STORE_ENABLE=NO
+
+      - name: Package unsigned IPA
+        script: |
+          echo "=== Packaging .app into .ipa ==="
+          set -e
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" -type d | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: No .app file found in build directory!"
+            exit 1
+          fi
+          echo "Found app bundle at: $APP_PATH"
+
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r -y "$OUTPUT_IPA_NAME" Payload
+          rm -rf Payload
+          echo "Successfully created $OUTPUT_IPA_NAME"
+
+    artifacts:
+      - "*.ipa"
