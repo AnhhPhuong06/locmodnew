@@ -55,11 +55,23 @@ workflows:
           echo "=== 2. Ensuring libraries exist in Products directory ==="
           PRODUCTS_DIR="build/Build/Products/Release-iphoneos"
           mkdir -p "$PRODUCTS_DIR"
+          # Search for any built static libraries across build directory
+          find build -name "libGameAssembly.a" -o -name "il2cpp.a" -o -name "libil2cpp.a" || true
+          # Ensure both libGameAssembly.a and il2cpp.a exist in PRODUCTS_DIR
           if [ -f "$PRODUCTS_DIR/libGameAssembly.a" ]; then
-            echo "Found libGameAssembly.a, copying to il2cpp.a..."
+            echo "Found $PRODUCTS_DIR/libGameAssembly.a ($(ls -lh "$PRODUCTS_DIR/libGameAssembly.a" | awk '{print $5}'))"
             cp -f "$PRODUCTS_DIR/libGameAssembly.a" "$PRODUCTS_DIR/il2cpp.a"
+          elif [ -f "$PRODUCTS_DIR/il2cpp.a" ]; then
+            echo "Found $PRODUCTS_DIR/il2cpp.a, copying to libGameAssembly.a..."
+            cp -f "$PRODUCTS_DIR/il2cpp.a" "$PRODUCTS_DIR/libGameAssembly.a"
           fi
-          ls -la "$PRODUCTS_DIR" || true
+          echo "=== Products directory content ==="
+          ls -lh "$PRODUCTS_DIR" || true
+          if [ -f "$PRODUCTS_DIR/libGameAssembly.a" ]; then
+            echo "Verifying symbols in libGameAssembly.a..."
+            nm "$PRODUCTS_DIR/libGameAssembly.a" | grep "il2cpp_thread_detach" || echo "Warning: il2cpp_thread_detach not found in libGameAssembly.a"
+          fi
+
 
       - name: Build unsigned .app
         script: |

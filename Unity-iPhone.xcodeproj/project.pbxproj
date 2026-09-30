@@ -1337,7 +1337,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"$CONFIGURATION_TEMP_DIR/artifacts/arm64/buildstate/\"\nmkdir -p \"$PROJECT_DIR/Il2CppTempDirArtifacts/$CONFIGURATION\"\nln -sF  \"$CONFIGURATION_TEMP_DIR/artifacts\" \"$PROJECT_DIR/Il2CppTempDirArtifacts/$CONFIGURATION/artifacts\"\nif [ \"$CONFIGURATION\" = \"Debug\" ];\nthen\n    IL2CPP_CONFIG=\"Debug\"\nelse\n    IL2CPP_CONFIG=\"Release\"\nfi\n\nHOST_ARCH=$(uname -m)\nif [ \"$HOST_ARCH\" = \"arm64\" ];\nthen\n    HOST_ARCH_BEE=\"arm64\"\nelse\n    HOST_ARCH_BEE=\"x64\"\nfi\n\nif [ \"$ARCHS\" = \"arm64\" ];\nthen\n    LIB_ARCH=\"arm64\"\nelif [ \"$ARCHS\" = \"x86_64\" ];\nthen\n   LIB_ARCH=\"x64\"\nelse\n   LIB_ARCH=\"$HOST_ARCH_BEE\"\nfi\n\necho \"Lib arch: $LIB_ARCH\"\necho \"Host arch: $HOST_ARCH\"\necho \"Bee arch: $HOST_ARCH_BEE\"\n\nIL2CPP_DIR=\"$PROJECT_DIR/Il2CppOutputProject/IL2CPP/build/deploy_$HOST_ARCH\"\nIL2CPP=\"$IL2CPP_DIR/il2cpp\"\nchmod +x \"$IL2CPP\"\nchmod +x \"$IL2CPP-compile\"\nchmod +x \"$IL2CPP_DIR/bee_backend/mac-$HOST_ARCH_BEE/bee_backend\"\n\n\"$IL2CPP\" --compile-cpp --platform=iOS --baselib-directory=\"Libraries\" --incremental-g-c-time-slice=3 --dotnetprofile=unityaot-macos --profiler-report --print-command-line --static-lib-il2-cpp --generatedcppdir=\"Il2CppOutputProject/Source/il2cppOutput\" --custom-il2-cpp-root=\"Il2CppOutputProject/IL2CPP\" --architecture=\"$LIB_ARCH\" --outputpath=\"$CONFIGURATION_BUILD_DIR/libGameAssembly.a\" --cachedirectory=\"Il2CppTempDirArtifacts/$CONFIGURATION/artifacts/$LIB_ARCH\" --configuration=\"$IL2CPP_CONFIG\" \ncp -f \"$CONFIGURATION_BUILD_DIR/libGameAssembly.a\" \"$CONFIGURATION_BUILD_DIR/il2cpp.a\" 2>/dev/null || true\nrm -rf \"$PROJECT_DIR/Il2CppTempDirArtifacts/\$CONFIGURATION\"\n";
+			shellScript = "mkdir -p \"$CONFIGURATION_TEMP_DIR/artifacts/arm64/buildstate/\"\nmkdir -p \"$PROJECT_DIR/Il2CppTempDirArtifacts/$CONFIGURATION\"\nln -sF  \"$CONFIGURATION_TEMP_DIR/artifacts\" \"$PROJECT_DIR/Il2CppTempDirArtifacts/$CONFIGURATION/artifacts\"\nif [ \"$CONFIGURATION\" = \"Debug\" ];\nthen\n    IL2CPP_CONFIG=\"Debug\"\nelse\n    IL2CPP_CONFIG=\"Release\"\nfi\n\nHOST_ARCH=$(uname -m)\nif [ \"$HOST_ARCH\" = \"arm64\" ];\nthen\n    HOST_ARCH_BEE=\"arm64\"\nelse\n    HOST_ARCH_BEE=\"x64\"\nfi\n\nif [ \"$ARCHS\" = \"arm64\" ];\nthen\n    LIB_ARCH=\"arm64\"\nelif [ \"$ARCHS\" = \"x86_64\" ];\nthen\n   LIB_ARCH=\"x64\"\nelse\n   LIB_ARCH=\"$HOST_ARCH_BEE\"\nfi\n\necho \"Lib arch: $LIB_ARCH\"\necho \"Host arch: $HOST_ARCH\"\necho \"Bee arch: $HOST_ARCH_BEE\"\n\nIL2CPP_DIR=\"$PROJECT_DIR/Il2CppOutputProject/IL2CPP/build/deploy_$HOST_ARCH\"\nIL2CPP=\"$IL2CPP_DIR/il2cpp\"\nchmod +x \"$IL2CPP\"\nchmod +x \"$IL2CPP-compile\"\nchmod +x \"$IL2CPP_DIR/bee_backend/mac-$HOST_ARCH_BEE/bee_backend\"\n\n\"$IL2CPP\" --compile-cpp --platform=iOS --baselib-directory=\"Libraries\" --incremental-g-c-time-slice=3 --dotnetprofile=unityaot-macos --profiler-report --print-command-line --generatedcppdir=\"Il2CppOutputProject/Source/il2cppOutput\" --custom-il2-cpp-root=\"Il2CppOutputProject/IL2CPP\" --architecture=\"$LIB_ARCH\" --outputpath=\"$CONFIGURATION_BUILD_DIR/libGameAssembly.a\" --cachedirectory=\"Il2CppTempDirArtifacts/$CONFIGURATION/artifacts/$LIB_ARCH\" --configuration=\"$IL2CPP_CONFIG\" \nif [ -d \"$PROJECT_DIR/Il2CppTempDirArtifacts\" ]; then\n    find \"$PROJECT_DIR/Il2CppTempDirArtifacts\" -name \"*.a\" -exec cp -f {} \"$CONFIGURATION_BUILD_DIR/\" \\; 2>/dev/null || true\nfi\ncp -f \"$CONFIGURATION_BUILD_DIR/libGameAssembly.a\" \"$CONFIGURATION_BUILD_DIR/il2cpp.a\" 2>/dev/null || true\nrm -rf \"$PROJECT_DIR/Il2CppTempDirArtifacts/\\$CONFIGURATION\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2049,6 +2049,7 @@
 					CoreMotion,
 					"-weak-lSystem",
 					"$(OTHER_LDFLAGS_FRAMEWORK)",
+					"$CONFIGURATION_BUILD_DIR/il2cpp.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.unity3d.framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -2120,6 +2121,7 @@
 					CoreMotion,
 					"-weak-lSystem",
 					"$(OTHER_LDFLAGS_FRAMEWORK)",
+					"$CONFIGURATION_BUILD_DIR/il2cpp.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.unity3d.framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -2192,6 +2194,7 @@
 					CoreMotion,
 					"-weak-lSystem",
 					"$(OTHER_LDFLAGS_FRAMEWORK)",
+					"$CONFIGURATION_BUILD_DIR/il2cpp.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.unity3d.framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -2265,6 +2268,7 @@
 					CoreMotion,
 					"-weak-lSystem",
 					"$(OTHER_LDFLAGS_FRAMEWORK)",
+					"$CONFIGURATION_BUILD_DIR/il2cpp.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.unity3d.framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
