@@ -33,6 +33,11 @@ workflows:
 
       - name: Build GameAssembly (IL2CPP)
         script: |
+          echo "=== 0. Grant executable permissions to IL2CPP tools ==="
+          chmod -R +x Il2CppOutputProject/IL2CPP/build/ || true
+          chmod +x process_symbols.sh || true
+          chmod +x process_symbols_il2cpp.sh || true
+
           echo "=== 1. Building GameAssembly (IL2CPP static library) ==="
           xcodebuild build \
             -project "$XCODE_PROJECT" \
